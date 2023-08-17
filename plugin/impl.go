@@ -9,57 +9,60 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v53/github"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
+	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
 )
 
-// Settings for the Plugin.
-type Settings struct {
-	BaseURL     string
-	IssueNum    int
-	Key         string
-	Message     string
-	Update      bool
-	APIKey      string
-	SkipMissing bool
-	IsFile      bool
-
-	baseURL *url.URL
-}
-
 var ErrPluginEventNotSupported = errors.New("event not supported")
+
+// Execute provides the implementation of the plugin.
+//
+//nolint:revive
+func (p *Plugin) run(ctx context.Context, cCtx *cli.Context) error {
+	if err := p.Validate(); err != nil {
+		return fmt.Errorf("validation failed: %w", err)
+	}
+
+	//nolint:contextcheck
+	if err := p.Execute(); err != nil {
+		return fmt.Errorf("execution failed: %w", err)
+	}
+
+	return nil
+}
 
 // Validate handles the settings validation of the plugin.
 func (p *Plugin) Validate() error {
 	var err error
 
-	if p.pipeline.Build.Event != "pull_request" {
-		return fmt.Errorf("%w: %s", ErrPluginEventNotSupported, p.pipeline.Build.Event)
+	if p.Metadata.Pipeline.Event != "pull_request" {
+		return fmt.Errorf("%w: %s", ErrPluginEventNotSupported, p.Metadata.Pipeline.Event)
 	}
 
-	if p.settings.Message != "" {
-		if p.settings.Message, p.settings.IsFile, err = readStringOrFile(p.settings.Message); err != nil {
-			return fmt.Errorf("error while reading %s: %w", p.settings.Message, err)
+	if p.Settings.Message != "" {
+		if p.Settings.Message, p.Settings.IsFile, err = readStringOrFile(p.Settings.Message); err != nil {
+			return fmt.Errorf("error while reading %s: %w", p.Settings.Message, err)
 		}
 	}
 
-	if !strings.HasSuffix(p.settings.BaseURL, "/") {
-		p.settings.BaseURL += "/"
+	if !strings.HasSuffix(p.Settings.BaseURL, "/") {
+		p.Settings.BaseURL += "/"
 	}
 
-	p.settings.baseURL, err = url.Parse(p.settings.BaseURL)
+	p.Settings.baseURL, err = url.Parse(p.Settings.BaseURL)
 	if err != nil {
 		return fmt.Errorf("failed to parse base url: %w", err)
 	}
 
-	if p.settings.Key == "" {
-		key := fmt.Sprintf("%s/%s/%d", p.pipeline.Repo.Owner, p.pipeline.Repo.Name, p.settings.IssueNum)
+	if p.Settings.Key == "" {
+		key := fmt.Sprintf("%s/%s/%d", p.Metadata.Repository.Owner, p.Metadata.Repository.Name, p.Settings.IssueNum)
 		hash := sha256.Sum256([]byte(key))
-		p.settings.Key = fmt.Sprintf("%x", hash)
+		p.Settings.Key = fmt.Sprintf("%x", hash)
 	}
 
-	if p.settings.Key, _, err = readStringOrFile(p.settings.Key); err != nil {
-		return fmt.Errorf("error while reading %s: %w", p.settings.Key, err)
+	if p.Settings.Key, _, err = readStringOrFile(p.Settings.Key); err != nil {
+		return fmt.Errorf("error while reading %s: %w", p.Settings.Key, err)
 	}
 
 	return nil
@@ -67,32 +70,33 @@ func (p *Plugin) Validate() error {
 
 // Execute provides the implementation of the plugin.
 func (p *Plugin) Execute() error {
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: p.settings.APIKey})
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: p.Settings.APIKey})
 	tc := oauth2.NewClient(
-		context.WithValue(context.Background(), oauth2.HTTPClient, p.network.Client),
+		context.WithValue(p.Network.Context, oauth2.HTTPClient, p.Network.Client),
 		ts,
 	)
 
 	client := github.NewClient(tc)
-	client.BaseURL = p.settings.baseURL
+	client.BaseURL = p.Settings.baseURL
 
 	commentClient := commentClient{
 		Client:   client,
-		Repo:     p.pipeline.Repo.Name,
-		Owner:    p.pipeline.Repo.Owner,
-		Message:  p.settings.Message,
-		Update:   p.settings.Update,
-		Key:      p.settings.Key,
-		IssueNum: p.pipeline.Build.PullRequest,
+		Repo:     p.Metadata.Repository.Name,
+		Owner:    p.Metadata.Repository.Owner,
+		Message:  p.Settings.Message,
+		Update:   p.Settings.Update,
+		Key:      p.Settings.Key,
+		IssueNum: p.Metadata.Curr.PullRequest,
 	}
 
-	if p.settings.SkipMissing && !p.settings.IsFile {
-		logrus.Infof("comment skipped: 'message' is not a valid path or file does not exist while 'skip-missing' is enabled")
+	if p.Settings.SkipMissing && !p.Settings.IsFile {
+		log.Info().
+			Msg("comment skipped: 'message' is not a valid path or file does not exist while 'skip-missing' is enabled")
 
 		return nil
 	}
 
-	err := commentClient.issueComment(p.network.Context)
+	err := commentClient.issueComment(p.Network.Context)
 	if err != nil {
 		return fmt.Errorf("failed to create or update comment: %w", err)
 	}

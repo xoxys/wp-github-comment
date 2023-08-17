@@ -1,6 +1,6 @@
 /dist/
 /release/
-/drone-github-comment*
+/wp-github-comment*
 
 coverage.out
 CHANGELOG.md

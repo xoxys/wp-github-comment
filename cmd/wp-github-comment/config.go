@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/thegeeklab/drone-github-comment/plugin"
+	"github.com/thegeeklab/wp-github-comment/plugin"
 	"github.com/urfave/cli/v2"
 )
 

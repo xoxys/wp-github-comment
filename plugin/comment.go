@@ -8,7 +8,6 @@ import (
 	"github.com/google/go-github/v53/github"
 )
 
-// Release holds ties the drone env data and github client together.
 type commentClient struct {
 	Message  string
 	Update   bool
