@@ -20,6 +20,10 @@ Woodpecker CI plugin to add comments to GitHub Issues and Pull Requests.
 
 ## Usage
 
+{{< hint type=important >}}
+Due to the nature of this plugin, a secret for the GitHub token may need to be exposed for pull request events in Woodpecker. Please be careful with this option, as a malicious actor may submit a pull request that exposes your secrets. Do not disclose secrets to PRs in public environments without further protection.
+{{< /hint >}}
+
 {{< hint type=note >}}
 Only pull request events are supported by this plugin. Running the plugin on other events will result in an error.
 {{< /hint >}}
