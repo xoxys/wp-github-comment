@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/google/go-github/v53/github"
+	"github.com/google/go-github/v54/github"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
