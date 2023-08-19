@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/google/go-github/v54 v54.0.0
 	github.com/rs/zerolog v1.30.0
-	github.com/thegeeklab/wp-plugin-go v0.3.1
+	github.com/thegeeklab/wp-plugin-go v0.4.0
 	github.com/urfave/cli/v2 v2.25.7
 	golang.org/x/oauth2 v0.11.0
 )
