@@ -6,7 +6,7 @@ import (
 	wp "github.com/thegeeklab/wp-plugin-go/plugin"
 )
 
-// Plugin implements provide the plugin implementation.
+// Plugin implements provide the plugin.
 type Plugin struct {
 	*wp.Plugin
 	Settings *Settings
