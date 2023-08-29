@@ -1,7 +1,7 @@
 repository:
   name: wp-github-comment
   description: Woodpecker CI plugin to add comments to GitHub Issues and Pull Requests
-  homepage: https://wp-plugin-index.geekdocs.de/plugins/wp-github-comment
+  homepage: https://woodpecker-plugins.geekdocs.de/plugins/wp-github-comment
   topics: woodpecker-ci, woodpecker, woodpecker-plugin
 
   private: false

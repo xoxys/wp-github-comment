@@ -10,7 +10,7 @@ Woodpecker CI plugin to add comments to GitHub Issues and Pull Requests
 [![Source: GitHub](https://img.shields.io/badge/source-github-blue.svg?logo=github&logoColor=white)](https://github.com/thegeeklab/wp-github-comment)
 [![License: MIT](https://img.shields.io/github/license/thegeeklab/wp-github-comment)](https://github.com/thegeeklab/wp-github-comment/blob/main/LICENSE)
 
-Woodpecker CI plugin to add comments to GitHub Issues and Pull Requests. You can find the full documentation at [https://wp-plugin-index.geekdocs.de](https://wp-plugin-index.geekdocs.de/plugins/wp-github-comment).
+Woodpecker CI plugin to add comments to GitHub Issues and Pull Requests. You can find the full documentation at [https://woodpecker-plugins.geekdocs.de](https://woodpecker-plugins.geekdocs.de/plugins/wp-github-comment).
 
 ## Contributors
 
