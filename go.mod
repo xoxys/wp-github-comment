@@ -3,7 +3,7 @@ module github.com/thegeeklab/wp-github-comment
 go 1.21
 
 require (
-	github.com/google/go-github/v56 v56.0.0
+	github.com/google/go-github/v57 v57.0.0
 	github.com/rs/zerolog v1.31.0
 	github.com/thegeeklab/wp-plugin-go v1.0.2
 	github.com/urfave/cli/v2 v2.26.0
