@@ -34,7 +34,7 @@ name: default
 
 steps:
   - name: pr-comment
-    image: thegeeklab/wp-github-comment
+    image: quay.io/thegeeklab/wp-github-comment
     settings:
       api_key: ghp_3LbMg9Kncpdkhjp3bh3dMnKNXLjVMTsXk4sM
       message: "CI run completed successfully"
