@@ -12,7 +12,7 @@ properties:
 
       Only need to be changed for GitHub enterprise in most cases.
     type: string
-    defaultvalue: "https://api.github.com/"
+    defaultValue: "https://api.github.com/"
     required: false
 
   - name: key
@@ -33,13 +33,12 @@ properties:
     description: |
       Skip comment creation if the given message file does not exist.
     type: bool
-    defaultvalue: false
+    defaultValue: false
     required: false
 
   - name: update
     description: |
       Enable update of an existing comment that matches the key.
-    defaultValue: false
     type: bool
-    defaultvalue: false
+    defaultValue: false
     required: false
