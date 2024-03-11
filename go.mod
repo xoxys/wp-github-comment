@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/google/go-github/v60 v60.0.0
 	github.com/rs/zerolog v1.32.0
-	github.com/thegeeklab/wp-plugin-go v1.6.1
+	github.com/thegeeklab/wp-plugin-go v1.7.0
 	github.com/urfave/cli/v2 v2.27.1
 	golang.org/x/oauth2 v0.18.0
 )
