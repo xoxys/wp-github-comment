@@ -29,14 +29,11 @@ Only pull request events are supported by this plugin. Running the plugin on oth
 {{< /hint >}}
 
 ```YAML
-kind: pipeline
-name: default
-
 steps:
   - name: pr-comment
     image: quay.io/thegeeklab/wp-github-comment
     settings:
-      api_key: ghp_3LbMg9Kncpdkhjp3bh3dMnKNXLjVMTsXk4sM
+      api_key: ghp_randomstring
       message: "CI run completed successfully"
       update: true
 ```
@@ -71,7 +68,7 @@ docker run --rm \
   -e CI_REPO_OWNER=octocat \
   -e CI_REPO_NAME=foo \
   -e CI_COMMIT_PULL_REQUEST=1
-  -e PLUGIN_API_KEY=abc123 \
+  -e PLUGIN_API_KEY=ghp_randomstring \
   -e PLUGIN_MESSAGE="Demo comment" \
   -v $(pwd):/build:z \
   -w /build \
