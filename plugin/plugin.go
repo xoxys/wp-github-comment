@@ -3,7 +3,7 @@ package plugin
 import (
 	"net/url"
 
-	wp "github.com/thegeeklab/wp-plugin-go/plugin"
+	wp "github.com/thegeeklab/wp-plugin-go/v2/plugin"
 )
 
 // Plugin implements provide the plugin.

@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/go-github/v61/github"
 	"github.com/rs/zerolog/log"
-	"github.com/thegeeklab/wp-plugin-go/file"
+	"github.com/thegeeklab/wp-plugin-go/v2/file"
 	"golang.org/x/oauth2"
 )
 
