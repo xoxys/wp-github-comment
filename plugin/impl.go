@@ -74,18 +74,16 @@ func (p *Plugin) Execute() error {
 		ts,
 	)
 
-	client := github.NewClient(tc)
-	client.BaseURL = p.Settings.baseURL
+	gh := github.NewClient(tc)
+	gh.BaseURL = p.Settings.baseURL
 
-	commentClient := commentClient{
-		Client:   client,
-		Repo:     p.Metadata.Repository.Name,
-		Owner:    p.Metadata.Repository.Owner,
-		Message:  p.Settings.Message,
-		Update:   p.Settings.Update,
-		Key:      p.Settings.Key,
-		IssueNum: p.Metadata.Curr.PullRequest,
-	}
+	client := NewGithubClient(gh)
+	client.Issue.Repo = p.Metadata.Repository.Name
+	client.Issue.Owner = p.Metadata.Repository.Owner
+	client.Issue.Message = p.Settings.Message
+	client.Issue.Update = p.Settings.Update
+	client.Issue.Key = p.Settings.Key
+	client.Issue.Number = p.Metadata.Curr.PullRequest
 
 	if p.Settings.SkipMissing && !p.Settings.IsFile {
 		log.Info().
@@ -94,7 +92,7 @@ func (p *Plugin) Execute() error {
 		return nil
 	}
 
-	err := commentClient.issueComment(p.Network.Context)
+	_, err := client.Issue.AddComment(p.Network.Context)
 	if err != nil {
 		return fmt.Errorf("failed to create or update comment: %w", err)
 	}
