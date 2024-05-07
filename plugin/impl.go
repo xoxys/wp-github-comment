@@ -92,7 +92,7 @@ func (p *Plugin) Execute() error {
 		return nil
 	}
 
-	err := client.Issue.AddComment(p.Network.Context)
+	_, err := client.Issue.AddComment(p.Network.Context)
 	if err != nil {
 		return fmt.Errorf("failed to create or update comment: %w", err)
 	}

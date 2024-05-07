@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -22,10 +23,12 @@ func TestGithubIssue_FindComment(t *testing.T) {
 		name     string
 		comments []*github.IssueComment
 		want     *github.IssueComment
+		wantErr  error
 	}{
 		{
-			name: "no comments",
-			want: nil,
+			name:    "no comments",
+			want:    nil,
+			wantErr: ErrCommentNotFound,
 		},
 		{
 			name: "comment found",
@@ -39,7 +42,8 @@ func TestGithubIssue_FindComment(t *testing.T) {
 			comments: []*github.IssueComment{
 				{Body: github.String("other comment")},
 			},
-			want: nil,
+			want:    nil,
+			wantErr: ErrCommentNotFound,
 		},
 		{
 			name: "multiple comments",
@@ -71,6 +75,12 @@ func TestGithubIssue_FindComment(t *testing.T) {
 			}
 
 			got, err := issue.FindComment(ctx)
+			if tt.wantErr != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.want, got)
+
+				return
+			}
 
 			assert.NoError(t, err)
 			assert.Equal(t, tt.want, got)
@@ -92,11 +102,13 @@ func TestGithubIssue_AddComment(t *testing.T) {
 		update      bool
 		existingKey string
 		comments    []*github.IssueComment
+		want        *github.IssueComment
 		wantErr     bool
 	}{
 		{
 			name:   "create new comment",
 			update: false,
+			want:   &github.IssueComment{Body: github.String("test message\n<!-- id: test-key -->\n")},
 		},
 		{
 			name:   "update existing comment",
@@ -104,10 +116,12 @@ func TestGithubIssue_AddComment(t *testing.T) {
 			comments: []*github.IssueComment{
 				{ID: github.Int64(123), Body: github.String(keyPattern)},
 			},
+			want: &github.IssueComment{Body: github.String("test message\n<!-- id: test-key -->\n")},
 		},
 		{
 			name:   "update non-existing comment",
 			update: true,
+			want:   &github.IssueComment{Body: github.String("test message\n<!-- id: test-key -->\n")},
 		},
 		{
 			name:    "create new comment with error",
@@ -128,7 +142,11 @@ func TestGithubIssue_AddComment(t *testing.T) {
 						if tt.wantErr {
 							mock.WriteError(w, http.StatusInternalServerError, "internal server error")
 						} else {
-							_, _ = w.Write(mock.MustMarshal(tt.comments))
+							_, _ = w.Write(mock.MustMarshal(
+								&github.IssueComment{
+									Body: github.String(fmt.Sprintf("%s\n%s\n", message, keyPattern)),
+								},
+							))
 						}
 					}),
 				),
@@ -138,13 +156,11 @@ func TestGithubIssue_AddComment(t *testing.T) {
 						if tt.wantErr {
 							mock.WriteError(w, http.StatusInternalServerError, "internal server error")
 						} else {
-							patchResp := &github.IssueComment{}
-
-							if len(tt.comments) > 0 {
-								patchResp = tt.comments[0]
-							}
-
-							_, _ = w.Write(mock.MustMarshal(patchResp))
+							_, _ = w.Write(mock.MustMarshal(
+								&github.IssueComment{
+									Body: github.String(fmt.Sprintf("%s\n%s\n", message, keyPattern)),
+								},
+							))
 						}
 					}),
 				),
@@ -161,18 +177,16 @@ func TestGithubIssue_AddComment(t *testing.T) {
 				Update:  tt.update,
 			}
 
-			if tt.wantErr {
-				issue.Repo = "999"
-			}
-
-			err := issue.AddComment(ctx)
+			got, err := issue.AddComment(ctx)
 			if tt.wantErr {
 				assert.Error(t, err)
+				assert.Equal(t, tt.want, got)
 
 				return
 			}
 
 			assert.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

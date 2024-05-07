@@ -2,11 +2,14 @@ package plugin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/google/go-github/v61/github"
 )
+
+var ErrCommentNotFound = errors.New("no comment found")
 
 type GithubClient struct {
 	Client *github.Client
@@ -35,38 +38,30 @@ func NewGithubClient(client *github.Client) *GithubClient {
 // If the Update field is true, it will append a unique identifier to the comment
 // body and attempt to find and update the existing comment with that identifier.
 // Otherwise, it will create a new comment on the issue.
-func (i *GithubIssue) AddComment(ctx context.Context) error {
-	var (
-		err     error
-		comment *github.IssueComment
-		resp    *github.Response
-	)
-
+func (i *GithubIssue) AddComment(ctx context.Context) (*github.IssueComment, error) {
 	issueComment := &github.IssueComment{
 		Body: &i.Message,
 	}
 
 	if i.Update {
 		// Append plugin comment ID to comment message so we can search for it later
-		message := fmt.Sprintf("%s\n<!-- id: %s -->\n", i.Message, i.Key)
-		issueComment.Body = &message
+		*issueComment.Body = fmt.Sprintf("%s\n<!-- id: %s -->\n", i.Message, i.Key)
 
-		comment, err = i.FindComment(ctx)
+		comment, err := i.FindComment(ctx)
+		if err != nil && !errors.Is(err, ErrCommentNotFound) {
+			return comment, err
+		}
 
-		if err == nil && comment != nil {
-			_, resp, err = i.Client.Issues.EditComment(ctx, i.Owner, i.Repo, *comment.ID, issueComment)
+		if comment != nil {
+			comment, _, err = i.Client.Issues.EditComment(ctx, i.Owner, i.Repo, *comment.ID, issueComment)
+
+			return comment, err
 		}
 	}
 
-	if err == nil && resp == nil {
-		_, _, err = i.Client.Issues.CreateComment(ctx, i.Owner, i.Repo, i.Number, issueComment)
-	}
+	comment, _, err := i.Client.Issues.CreateComment(ctx, i.Owner, i.Repo, i.Number, issueComment)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return comment, err
 }
 
 // FindComment returns the GitHub issue comment that contains the specified key, or nil if no such comment exists.
@@ -97,6 +92,5 @@ func (i *GithubIssue) FindComment(ctx context.Context) (*github.IssueComment, er
 		}
 	}
 
-	//nolint:nilnil
-	return nil, nil
+	return nil, fmt.Errorf("%w key: %s", ErrCommentNotFound, i.Key)
 }
