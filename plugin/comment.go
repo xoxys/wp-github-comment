@@ -9,14 +9,13 @@ import (
 )
 
 type commentClient struct {
+	*github.Client
 	Message  string
 	Update   bool
 	Key      string
 	Repo     string
 	Owner    string
 	IssueNum int
-
-	*github.Client
 }
 
 func (cc *commentClient) issueComment(ctx context.Context) error {
