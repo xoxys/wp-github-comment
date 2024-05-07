@@ -15,12 +15,26 @@ properties:
     defaultValue: "https://api.github.com/"
     required: false
 
+  - name: insecure_skip_verify
+    description: |
+      Skip SSL verification.
+    type: bool
+    defaultValue: false
+    required: false
+
   - name: key
     description: |
       Unique identifier to assign to a comment.
 
       The identifier is used to update an existing comment.
     type: string
+    required: false
+
+  - name: log_level
+    description: |
+      Plugin log level.
+    type: string
+    defaultValue: "info"
     required: false
 
   - name: message
