@@ -8,10 +8,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/google/go-github/v61/github"
 	"github.com/rs/zerolog/log"
+	gh "github.com/thegeeklab/wp-github-comment/github"
 	"github.com/thegeeklab/wp-plugin-go/v2/file"
-	"golang.org/x/oauth2"
 )
 
 var ErrPluginEventNotSupported = errors.New("event not supported")
@@ -22,7 +21,6 @@ func (p *Plugin) run(ctx context.Context) error {
 		return fmt.Errorf("validation failed: %w", err)
 	}
 
-	//nolint:contextcheck
 	if err := p.Execute(); err != nil {
 		return fmt.Errorf("execution failed: %w", err)
 	}
@@ -68,22 +66,15 @@ func (p *Plugin) Validate() error {
 
 // Execute provides the implementation of the plugin.
 func (p *Plugin) Execute() error {
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: p.Settings.APIKey})
-	tc := oauth2.NewClient(
-		context.WithValue(p.Network.Context, oauth2.HTTPClient, p.Network.Client),
-		ts,
-	)
-
-	gh := github.NewClient(tc)
-	gh.BaseURL = p.Settings.baseURL
-
-	client := NewGithubClient(gh)
-	client.Issue.Repo = p.Metadata.Repository.Name
-	client.Issue.Owner = p.Metadata.Repository.Owner
-	client.Issue.Message = p.Settings.Message
-	client.Issue.Update = p.Settings.Update
-	client.Issue.Key = p.Settings.Key
-	client.Issue.Number = p.Metadata.Curr.PullRequest
+	client := gh.NewClient(p.Network.Context, p.Settings.baseURL, p.Settings.APIKey, p.Network.Client)
+	client.Issue.Opt = gh.IssueOptions{
+		Repo:    p.Metadata.Repository.Name,
+		Owner:   p.Metadata.Repository.Owner,
+		Message: p.Settings.Message,
+		Update:  p.Settings.Update,
+		Key:     p.Settings.Key,
+		Number:  p.Metadata.Curr.PullRequest,
+	}
 
 	if p.Settings.SkipMissing && !p.Settings.IsFile {
 		log.Info().
