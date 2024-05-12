@@ -12,6 +12,8 @@ import (
 	"github.com/thegeeklab/wp-github-comment/github/mocks"
 )
 
+var ErrInternalServerError = errors.New("internal server error")
+
 func TestGithubIssue_FindComment(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -156,7 +158,7 @@ func TestGithubIssue_AddComment(t *testing.T) {
 				Message: "test message",
 				Update:  false,
 			},
-			wantErr: errors.New("internal server error"),
+			wantErr: ErrInternalServerError,
 		},
 	}
 
