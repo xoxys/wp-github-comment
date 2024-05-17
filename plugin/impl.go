@@ -10,7 +10,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	gh "github.com/thegeeklab/wp-github-comment/github"
-	"github.com/thegeeklab/wp-plugin-go/v2/file"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v3/file"
 )
 
 var ErrPluginEventNotSupported = errors.New("event not supported")
@@ -37,7 +37,7 @@ func (p *Plugin) Validate() error {
 	}
 
 	if p.Settings.Message != "" {
-		if p.Settings.Message, p.Settings.IsFile, err = file.ReadStringOrFile(p.Settings.Message); err != nil {
+		if p.Settings.Message, p.Settings.IsFile, err = plugin_file.ReadStringOrFile(p.Settings.Message); err != nil {
 			return fmt.Errorf("error while reading %s: %w", p.Settings.Message, err)
 		}
 	}
@@ -57,7 +57,7 @@ func (p *Plugin) Validate() error {
 		p.Settings.Key = fmt.Sprintf("%x", hash)
 	}
 
-	if p.Settings.Key, _, err = file.ReadStringOrFile(p.Settings.Key); err != nil {
+	if p.Settings.Key, _, err = plugin_file.ReadStringOrFile(p.Settings.Key); err != nil {
 		return fmt.Errorf("error while reading %s: %w", p.Settings.Key, err)
 	}
 
