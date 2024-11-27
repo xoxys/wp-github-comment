@@ -3,7 +3,7 @@ module github.com/thegeeklab/wp-github-comment
 go 1.23.3
 
 require (
-	github.com/google/go-github/v66 v66.0.0
+	github.com/google/go-github/v67 v67.0.0
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.10.0
 	github.com/thegeeklab/wp-plugin-go/v3 v3.0.9
