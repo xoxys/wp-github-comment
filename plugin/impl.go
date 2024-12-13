@@ -10,7 +10,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	gh "github.com/thegeeklab/wp-github-comment/github"
-	plugin_file "github.com/thegeeklab/wp-plugin-go/v3/file"
+	plugin_file "github.com/thegeeklab/wp-plugin-go/v4/file"
 )
 
 var ErrPluginEventNotSupported = errors.New("event not supported")

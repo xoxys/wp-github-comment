@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	plugin_base "github.com/thegeeklab/wp-plugin-go/v3/plugin"
+	plugin_base "github.com/thegeeklab/wp-plugin-go/v4/plugin"
 	"github.com/urfave/cli/v2"
 )
 
